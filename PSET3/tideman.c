@@ -33,7 +33,7 @@ void add_pairs(void);
 void sort_pairs(void);
 void lock_pairs(void);
 void print_winner(void);
-void bubble_sort (pair arr[], int n);
+void bubble_sort(pair arr[], int n);
 bool check_cycle(int n, int m);
 
 int main(int argc, string argv[])
@@ -151,7 +151,7 @@ void add_pairs(void)
             {
                 pairs[pair_count].winner = i;
                 pairs[pair_count].loser = j;
-                pair_count +=1;
+                pair_count += 1;
             }
         }
     }
@@ -161,8 +161,8 @@ void add_pairs(void)
 // Sort pairs in decreasing order by strength of victory
 void sort_pairs(void)
 {
-    int n = sizeof(pairs) / sizeof(pairs[0]);
-    bubble_sort(pairs, n);
+    //int n = sizeof(pairs) / sizeof(pairs[0]);
+    bubble_sort(pairs, pair_count);
     return;
 }
 
@@ -174,6 +174,7 @@ void lock_pairs(void)
         if (!check_cycle(pairs[i].winner, pairs[i].loser))
         {
             locked[pairs[i].winner][pairs[i].loser] = true;
+            printf("Locked candidate %s and %s\n", candidates[pairs[i].winner], candidates[pairs[i].loser]);
         }
     }
     return;
@@ -182,14 +183,33 @@ void lock_pairs(void)
 // Print the winner of the election
 void print_winner(void)
 {
-    // TODO
+    for (int i = 0; i < candidate_count; i++)
+    {
+        bool source = true;
+
+        for (int j = 0; j < candidate_count; j++)
+        {
+            if (locked[j][i] == true)
+            {
+                source = false;
+                break;
+            }
+        }
+        if (source == true)
+        {
+            printf("%s\n", candidates[i]);
+        }
+    }
     return;
 }
 
 // Sorts array of pairs in decreasing order (by strength of victory) given the array length
-void bubble_sort (pair arr[], int n)
+void bubble_sort(pair arr[], int n)
 {
-    if (n < 1) return;
+    if (n < 1)
+    {
+        return;
+    }
     for (int i = 0; i < n; i++)
     {
         int strength_i = preferences[arr[i].winner][arr[i].loser];
@@ -202,11 +222,11 @@ void bubble_sort (pair arr[], int n)
             arr[i + 1] = aux;
         }
     }
-    bubble_sort (arr, n - 1);
+    bubble_sort(arr, n - 1);
     return;
 }
 
-
+// Checks for cycles in the graph
 bool check_cycle(int n, int m)
 {
     if (locked[m][n] == true)
@@ -216,9 +236,12 @@ bool check_cycle(int n, int m)
 
     for (int i = 0; i < candidate_count; i++)
     {
-        if (locked[m][i] == true)
+        if (locked[i][n] == true)
         {
-            check_cycle(n, i);
+            if (check_cycle(i, m))
+            {
+                return true;
+            }
         }
     }
     return false;
